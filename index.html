@@ -66,12 +66,6 @@
   <div>
     <span class="tag">Python · stdlib</span><span class="tag">HTML · CSS · JS</span><span class="tag">PWA</span><span class="tag">Web Push</span><span class="tag">SQLite</span><span class="tag">Hermes</span><span class="tag">tmux</span>
   </div>
-  <div class="grid g4 hero-stats">
-    <div class="card"><div class="stat">293</div><div class="cap">testes automatizados</div></div>
-    <div class="card"><div class="stat">55</div><div class="cap">commits</div></div>
-    <div class="card"><div class="stat">9</div><div class="cap">funcionalidades no app</div></div>
-    <div class="card"><div class="stat">0</div><div class="cap">frameworks no front</div></div>
-  </div>
 </header>
 
 <section>
@@ -173,11 +167,11 @@
   <div class="wrap">
     <div class="lab">04 · QUALIDADE</div>
     <h2>Como eu verifico</h2>
-    <div class="grid g3">
-      <div class="card"><div class="stat">293</div><div class="cap" style="margin-top:8px">testes de unidade e integração</div></div>
-      <div class="card"><div class="stat">390px</div><div class="cap" style="margin-top:8px">layout testado no tamanho de celular</div></div>
-      <div class="card"><div class="stat">Sim</div><div class="cap" style="margin-top:8px">pre-commit roda os testes e bloqueia segredos</div></div>
-    </div>
+    <ul class="list">
+      <li>Suíte de testes automatizados para o servidor, a API, a agenda, as finanças, as notícias e as notificações.</li>
+      <li>Layout verificado em largura de celular (390 px), com testes estáticos de layout.</li>
+      <li>Pre-commit que roda os testes e bloqueia segredos antes de cada commit.</li>
+    </ul>
     <p style="margin-top:20px">
       Mudanças só entram no repositório com os testes passando. Bugs corrigidos ganham teste de regressão, e a funcionalidade é conferida no app antes de ser dada como pronta.
     </p>
@@ -186,7 +180,46 @@
 
 <section>
   <div class="wrap">
-    <div class="lab">05 · LIMITAÇÕES</div>
+    <div class="lab">05 · UM DIA COM O DENTO</div>
+    <h2>O que eu uso no dia a dia</h2>
+    <div class="grid g2">
+      <div class="feat">
+        <div class="k">NOTÍCIAS</div>
+        <h3>Notícias do dia, por tema</h3>
+        <p>Cada dia tem um arquivo de notícias, com as categorias Clima, IA, Política e Mercado. Dá para filtrar por categoria e buscar no título, no resumo e na fonte. O bloco de clima vem dessas notícias: não é uma previsão do tempo em tempo real.</p>
+      </div>
+      <div class="feat">
+        <div class="k">AGENDA</div>
+        <h3>Eventos no app e no Google Agenda</h3>
+        <p>Visões de dia, semana e mês. O app cria eventos na própria agenda e lê o Google Agenda em modo somente leitura. Ainda não há lembretes automáticos antes dos compromissos.</p>
+      </div>
+      <div class="feat">
+        <div class="k">GASTOS</div>
+        <h3>De onde veio cada gasto</h3>
+        <p>Painel do mês com gastos por dia, categoria e local, além de recorrentes e uma previsão. Ao escolher uma categoria ou buscar um local, a lista mostra as transações que compõem o número, com filtros por mês.</p>
+      </div>
+      <div class="feat">
+        <div class="k">CONVERSA</div>
+        <h3>Perguntas ao Hermes</h3>
+        <p>Conversas com o agente, com pastas, busca e histórico compactado. Dá para pedir ao Hermes uma análise ou um resumo, mas a integração é feita pelo agente, e não por uma tela dedicada.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:40px">Em construção</h3>
+    <p class="muted" style="margin-bottom:16px">O que eu quero que o Dento faça e ainda não faz. Não está publicado como funcionando.</p>
+    <ul class="list">
+      <li><strong>Acompanhamento de investimentos:</strong> posição, rentabilidade e alocação. Hoje não há tela nem dados de investimentos no app.</li>
+      <li><strong>Lembretes de compromissos:</strong> aviso antes de cada evento, pelas notificações que já existem.</li>
+      <li><strong>Resumo diário:</strong> envio automático de notícias relevantes e de um resumo do dia, por notificação.</li>
+      <li><strong>Previsão do tempo:</strong> clima em tempo real para o local do dia, em vez de depender do noticiário.</li>
+      <li><strong>Salvar no segundo cérebro:</strong> gravar automaticamente as conversas importantes na wiki pessoal, que hoje é atualizada pelo agente e não pelo app.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">06 · LIMITAÇÕES</div>
     <h2>O que ainda falta</h2>
     <ul class="list">
       <li>O front ainda usa scripts clássicos com funções globais. Migrar para módulos ES é o próximo passo.</li>
@@ -198,7 +231,7 @@
 
 <section>
   <div class="wrap">
-    <div class="lab">06 · PRÓXIMOS PASSOS</div>
+    <div class="lab">07 · PRÓXIMOS PASSOS</div>
     <h2>Se eu continuasse</h2>
     <ol class="steps">
       <li>Converter o front para módulos ES e remover os handlers inline.</li>
