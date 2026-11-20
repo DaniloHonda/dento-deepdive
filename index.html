@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dento · Deep dive</title>
+  <meta name="description" content="Dento: assistente pessoal próprio, que roda em casa e funciona como app no celular. Funcionalidades, arquitetura e decisões." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <style>
+    :root {
+      --bg: #040406;
+      --panel: #0A0A0F;
+      --line: #1E1F2B;
+      --text: #D4D0C6;
+      --muted: #7A7D90;
+      --brasa: #E5383B;
+      --ciano: #3FB6C4;
+      --roxo: #8F7CF0;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, sans-serif; line-height: 1.6; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+    section { padding: 72px 0; border-top: 1px solid var(--line); }
+    .lab { font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; color: var(--brasa); }
+    h1, h2, h3 { font-family: Anton, sans-serif; font-weight: 400; text-transform: uppercase; margin: 0; }
+    h1 { font-size: clamp(44px, 8vw, 88px); line-height: 0.95; margin-top: 12px; }
+    h2 { font-size: clamp(34px, 5vw, 56px); line-height: 1; margin: 10px 0 18px; }
+    h3 { font-size: 22px; margin-bottom: 10px; }
+    p { margin: 0 0 14px; max-width: 72ch; }
+    .muted { color: var(--muted); }
+    .cap { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+    .card { background: var(--panel); border: 1px solid var(--line); padding: 20px; }
+    .grid { display: grid; gap: 16px; }
+    .g2 { grid-template-columns: 1fr; }
+    .g3 { grid-template-columns: 1fr; }
+    .g4 { grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 760px) { .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); } }
+    .stat { font-family: Anton, sans-serif; font-size: 56px; line-height: 1; }
+    .hero-stats { margin-top: 36px; }
+    .tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--ciano); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; margin: 0 6px 6px 0; }
+    .note { border-left: 3px solid var(--brasa); padding: 10px 14px; background: var(--panel); margin: 16px 0; }
+    .feat { border: 1px solid var(--line); background: var(--panel); padding: 18px; }
+    .feat h3 { font-size: 20px; color: var(--text); margin-bottom: 6px; }
+    .feat .k { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--brasa); margin-bottom: 6px; }
+    .feat p { margin: 0; font-size: 15px; }
+    ul.list, ol.steps { padding-left: 20px; margin: 0; }
+    ul.list li, ol.steps li { margin-bottom: 10px; max-width: 72ch; }
+    .flow { display: grid; gap: 10px; }
+    .flow div { border: 1px solid var(--line); padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--panel); }
+    .flow div b { color: var(--brasa); font-weight: 500; margin-right: 6px; }
+    footer { padding: 40px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    a { color: var(--ciano); }
+  </style>
+</head>
+<body>
+
+<header class="wrap" style="padding-top:56px">
+  <div class="lab">PROJETO PESSOAL · PWA · PYTHON</div>
+  <h1>Dento</h1>
+  <p style="font-size:20px;margin-top:20px;max-width:62ch">
+    Um assistente pessoal que eu mesmo construí. Ele roda no meu servidor, conversa com o agente Hermes e aparece no celular como um app instalado, com conversas, agenda, notícias, finanças e um terminal do servidor.
+  </p>
+  <div>
+    <span class="tag">Python · stdlib</span><span class="tag">HTML · CSS · JS</span><span class="tag">PWA</span><span class="tag">Web Push</span><span class="tag">SQLite</span><span class="tag">Hermes</span><span class="tag">tmux</span>
+  </div>
+  <div class="grid g4 hero-stats">
+    <div class="card"><div class="stat">293</div><div class="cap">testes automatizados</div></div>
+    <div class="card"><div class="stat">55</div><div class="cap">commits</div></div>
+    <div class="card"><div class="stat">9</div><div class="cap">funcionalidades no app</div></div>
+    <div class="card"><div class="stat">0</div><div class="cap">frameworks no front</div></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="lab">01 · PARA QUE SERVE</div>
+    <h2>Um lugar só para o dia a dia</h2>
+    <p>
+      Em vez de alternar entre um chat de IA, o calendário, notícias, planilhas de gastos e um terminal, o Dento junta tudo numa tela de celular. Quem decide o que fazer continua sendo eu: o app mostra a informação e executa o que eu peço.
+    </p>
+    <p>
+      Ele também é um laboratório. Cada área nova é uma forma de testar uma ideia real de uso, e as decisões de engenharia ficam registradas em documentos no próprio repositório.
+    </p>
+    <div class="note">
+      Uso pessoal, rodando em rede privada. Não há versão pública hospedada nem dados de terceiros nesta página.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">02 · FUNCIONALIDADES</div>
+    <h2>O que o app faz</h2>
+    <div class="grid g3">
+      <div class="feat">
+        <div class="k">CHAT</div>
+        <h3>Conversas com o Hermes</h3>
+        <p>Respostas em tempo real, com várias conversas em paralelo. A resposta continua sendo gerada mesmo com o app fechado, e a conversa retoma sozinha ao reabrir.</p>
+      </div>
+      <div class="feat">
+        <div class="k">ORGANIZAÇÃO</div>
+        <h3>Pastas, busca e títulos</h3>
+        <p>Conversas em pastas, com renomear, apagar, busca e exportação. Títulos e temas são gerados automaticamente, e um título manual sempre prevalece.</p>
+      </div>
+      <div class="feat">
+        <div class="k">HISTÓRICO</div>
+        <h3>Compactar sem trocar de chat</h3>
+        <p>O histórico longo vira um resumo no começo da conversa, mantendo o mesmo chat e o contexto necessário para continuar.</p>
+      </div>
+      <div class="feat">
+        <div class="k">ENTRADA</div>
+        <h3>Voz, anexos e arrastar e soltar</h3>
+        <p>Ditado por voz, envio de arquivos e imagens e anexos por arrastar e soltar no desktop, tudo na mesma caixa de mensagem.</p>
+      </div>
+      <div class="feat">
+        <div class="k">AVISOS</div>
+        <h3>Notificações confiáveis</h3>
+        <p>Web Push quando uma resposta fica pronta, com canal de Telegram como alternativa. Há fila com retry e backoff, e um health check que avisa quando o serviço cai.</p>
+      </div>
+      <div class="feat">
+        <div class="k">AGENDA</div>
+        <h3>Dia, semana e mês</h3>
+        <p>Leitura do Google Agenda em modo somente leitura, com visões por dia, semana e mês e navegação pensada para toque.</p>
+      </div>
+      <div class="feat">
+        <div class="k">NOTÍCIAS</div>
+        <h3>Feed por dia e categoria</h3>
+        <p>Tela própria, aberta pela home, com filtro por dia e categoria e busca no conteúdo.</p>
+      </div>
+      <div class="feat">
+        <div class="k">FINANÇAS</div>
+        <h3>Painel analítico</h3>
+        <p>Renda, gasto por dia, categoria e local, recorrentes e previsão. Os dados vêm de uma integração somente leitura, e a classificação de fluxo é feita pelo próprio app.</p>
+      </div>
+      <div class="feat">
+        <div class="k">SERVIDOR</div>
+        <h3>Terminal no navegador</h3>
+        <p>Acesso ao terminal do servidor com login persistente via tmux, barra de teclas para celular e copiar e colar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">03 · COMO FUNCIONA</div>
+    <h2>Arquitetura</h2>
+    <div class="grid g2">
+      <div class="flow">
+        <div><b>1</b>Celular ou navegador acessam o app instalado (PWA) pela rede privada</div>
+        <div><b>2</b>server.py (Python, biblioteca padrão) atende a API e os arquivos estáticos</div>
+        <div><b>3</b>O servidor encaminha as mensagens ao gateway do Hermes e acompanha as respostas</div>
+        <div><b>4</b>Ao terminar, uma fila SQLite dispara as notificações (Web Push e Telegram)</div>
+        <div><b>5</b>Conversas são gravadas de forma atômica, com lock, para não corromper o histórico</div>
+      </div>
+      <div class="card">
+        <h3>Decisões</h3>
+        <ul class="list">
+          <li><strong>Backend em Python puro:</strong> já funciona, tem testes e trocar o backend agora traria risco sem ganho perceptível para uso pessoal.</li>
+          <li><strong>Front sem framework e sem build:</strong> arquivos estáticos servidos direto, carga rápida no celular e cache do service worker simples.</li>
+          <li><strong>Carregamento sob demanda:</strong> o grafo 3D e os gráficos de finanças só carregam quando a tela é aberta.</li>
+          <li><strong>Segurança:</strong> o app escuta só em localhost, e a origem de cada POST é conferida. O pre-commit bloqueia segredos no diff.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">04 · QUALIDADE</div>
+    <h2>Como eu verifico</h2>
+    <div class="grid g3">
+      <div class="card"><div class="stat">293</div><div class="cap" style="margin-top:8px">testes de unidade e integração</div></div>
+      <div class="card"><div class="stat">390px</div><div class="cap" style="margin-top:8px">layout testado no tamanho de celular</div></div>
+      <div class="card"><div class="stat">Sim</div><div class="cap" style="margin-top:8px">pre-commit roda os testes e bloqueia segredos</div></div>
+    </div>
+    <p style="margin-top:20px">
+      Mudanças só entram no repositório com os testes passando. Bugs corrigidos ganham teste de regressão, e a funcionalidade é conferida no app antes de ser dada como pronta.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">05 · LIMITAÇÕES</div>
+    <h2>O que ainda falta</h2>
+    <ul class="list">
+      <li>O front ainda usa scripts clássicos com funções globais. Migrar para módulos ES é o próximo passo.</li>
+      <li>O acesso depende da rede privada. Não há login público pensado para outras pessoas.</li>
+      <li>O app é para uma pessoa só. Não há multiusuário nem separação de dados entre contas.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="lab">06 · PRÓXIMOS PASSOS</div>
+    <h2>Se eu continuasse</h2>
+    <ol class="steps">
+      <li>Converter o front para módulos ES e remover os handlers inline.</li>
+      <li>Medir o carregamento no celular antes de decidir sobre um build com Vite.</li>
+      <li>Escolher uma biblioteca leve ou SVG próprio para os gráficos, com base em medição.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Projeto pessoal de Danilo Honda. Código do app no repositório privado; esta página descreve o projeto sem expor dados, endereços ou credenciais.</p>
+  </div>
+</footer>
+
+</body>
+</html>
